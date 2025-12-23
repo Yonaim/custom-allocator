@@ -176,17 +176,42 @@ namespace yn
 
       public:
         // constructor
-        PoolAllocator() : _state() PoolAllocator(const PoolAllocator &orig);
-        PoolAllocator &operator=(cosnt PoolAllocator &orig);
+        PoolAllocator() : _state(PoolAllocState()) {}
+        PoolAllocator(const PoolAllocator &orig) : _state(orig._state) {}
+        PoolAllocator &operator=(cosnt PoolAllocator &orig)
+        {
+            _state = orig._state;
+            return *this;
+        }
         template <class U>
-        PoolAllocator(const PoolAllocator<U> &orig);
+        PoolAllocator(const PoolAllocator<U> &orig) : _state(orig._state)
+        {
+        }
 
-        // API
-        pointer   allocate(size_type n, const void *cvp = 0);
-        void      deallocate(pointer p, size_type n);
-        size_type max_size();
-        void      construct(pointer p, const T &val);
-        void      destory(pointer p);
+        pointer allocate(size_type n, const void *cvp = 0)
+        {
+            if (n == 0)
+                return NULL;
+            void *mem = _state->allocate_bytes(n * sizeof(T));
+            return reinterpret_cast<pointer>(mem);
+        }
+
+        void deallocate(pointer p, size_type n)
+        {
+            if (!p || n == 0)
+                return;
+            _state->deallocate_bytes(p, n * sizeof(T));
+        }
+
+        size_type max_size() { return std::numeric_limits<size_t>::max() / sizeof(T); }
+
+        void construct(pointer p, const T &val)
+        {
+            // 위치 지정 new (이미 할당된 메모리에 생성자만 호출)
+            new ((void *)p) T(val);
+        }
+
+        void destory(pointer p) { p->~T(); }
     };
 } // namespace yn
 
