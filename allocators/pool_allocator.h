@@ -1,5 +1,5 @@
-#ifndef POOL_ALLOCATOR_HPP
-#define POOL_ALLOCATOR_HPP
+#ifndef POOL_ALLOCATOR_H
+#define POOL_ALLOCATOR_H
 
 #include <cstddef> // size_t, ptrdiff_t
 #include <limits>
@@ -118,6 +118,7 @@ namespace yona
             }
         }
 
+        // 선형 탐색 O(n)
         PoolNode *find_or_create_pool(size_t bs)
         {
             PoolNode *p;
