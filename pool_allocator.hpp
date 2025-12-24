@@ -81,9 +81,10 @@ namespace yona
                 c = p->chunk_list;
                 while (c)
                 {
+                    ChunkNode *old_c = c;
                     ::operator delete(c->mem);
-                    c = c->next;
                     delete c;
+                    c = old_c->next;
                 }
                 _pools = p->next;
                 delete p;
